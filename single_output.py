@@ -25,6 +25,10 @@ class SingleOutputEngine:
         self.train_loader = train_loader
         self.val_loader = val_loader
         
+    def to_device(self):
+        self.model.to(self.device)
+        
+        
     def _mini_batch(self, validation=False):
         
         batch_losses = []
@@ -84,6 +88,35 @@ class SingleOutputEngine:
             self.train_losses.append(self._mini_batch())
             if self.val_loader:
                 self.val_losses.append(self._mini_batch(validation=True))
+                
+    def predict(self, x):
+        self.model.eval()
+        x = x.to(self.device)
+        predictions = self.model(x)
+        self.model.train()
+        return predictions
+    
+    def save(self, file):
+        model_dict = {
+            "model_state_dict": self.model.state_dict(),
+            "optimizer_state_dict": self.optimizer.state_dict(),
+            "train_losses": self.train_losses,
+            "val_losses": self.val_losses,
+            "epoch": self.epoch,
+        }
+        torch.save(model_dict, file)
+        
+    def load(self, file):
+        model_dict = torch.load(file)
+        self.model.load_state_dict(model_dict["model_state_dict"])
+        self.optimizer.load_state_dict(model_dict["optimizer_state_dict"])
+        self.train_losses = model_dict["train_losses"]
+        self.val_losses = model_dict["val_losses"]
+        self.epoch = model_dict["epoch"]
+        
+        self.to_device()
+        
+        self.model.train()
             
     
         

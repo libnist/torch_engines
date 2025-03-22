@@ -133,7 +133,9 @@ class SingleOutputEngine:
                 predictions = probabilites >= 0.5
                 
                 checking = predictions == y
-                accuracies.append(checking.sum() / len(checking))
+                
+                accuracy = checking.sum() / len(checking)
+                accuracies.append(accuracy.cpu().item())
         return np.array(accuracies).mean()
                 
             

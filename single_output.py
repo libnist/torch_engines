@@ -127,6 +127,7 @@ class SingleOutputEngine:
         
         with torch.no_grad():
             for x, y in loader:
+                x, y = x.to(self.device), y.to(self.device)
                 logits = self.predict(x)
                 probabilites = torch.sigmoid(logits)
                 predictions = probabilites >= 0.5

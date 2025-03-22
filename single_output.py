@@ -117,6 +117,24 @@ class SingleOutputEngine:
         self.to_device()
         
         self.model.train()
+        
+    def accuracy(self, on_train=False):
+        loader = self.val_loader
+        if on_train:
+            loader = self.train_loader
+            
+        accuracies = []
+        
+        with torch.no_grad():
+            for x, y in loader:
+                logits = self.predict(x)
+                probabilites = torch.sigmoid(logits)
+                predictions = probabilites >= 0.5
+                
+                checking = predictions == y
+                accuracies.append(checking.sum() / len(checking))
+        return np.array(accuracies).mean()
+                
             
     
         

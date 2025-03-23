@@ -29,6 +29,14 @@ class SingleOutputEngine:
         self.model.to(self.device)
         
         
+    def model_numel(self):
+        numel = 0
+        for param in self.model.parameters():
+            if param.requires_grad:
+                numel += param.numel()
+        return numel
+        
+        
     def _mini_batch(self, validation=False):
         
         batch_losses = []
